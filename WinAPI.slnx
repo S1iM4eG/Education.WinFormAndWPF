@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="DialogBox/DialogBox.vcxproj" Id="e0481108-6c8e-4e62-aa0b-3546cf5ce250" />
+  <Project Path="WinAPI/WinAPI.vcxproj" Id="7a29bdaf-1918-41a3-9bc7-772d5d6da233" />
+</Solution>
