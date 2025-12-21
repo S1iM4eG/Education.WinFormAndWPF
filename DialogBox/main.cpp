@@ -1,4 +1,5 @@
 ﻿#include<Windows.h>
+#include <CommCtrl.h> 
 #include"resource.h"
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -18,7 +19,10 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)); // Загружаем иконку
 		SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon); // Кому отправляем
+		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
+		SendMessage(GetDlgItem(hwnd, IDC_EDIT_LOGIN), EM_SETCUEBANNER, FALSE, (LPARAM)"Введите имя пользователя");
 	}
+	return TRUE;
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
