@@ -1,4 +1,4 @@
-#include<Windows.h>
+п»ї#include<Windows.h>
 #include"resource.h"
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -14,10 +14,10 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	case WM_INITDIALOG: //Инициализация окна диалога. Секция отрабатывает один раз, при запуске окна.
+	case WM_INITDIALOG: //РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РѕРєРЅР° РґРёР°Р»РѕРіР°. РЎРµРєС†РёСЏ РѕС‚СЂР°Р±Р°С‚С‹РІР°РµС‚ РѕРґРёРЅ СЂР°Р·, РїСЂРё Р·Р°РїСѓСЃРєРµ РѕРєРЅР°.
 	{
-		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)); // Загружаем иконку
-		SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon); // Кому отправляем
+		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)); // Р—Р°РіСЂСѓР¶Р°РµРј РёРєРѕРЅРєСѓ
+		SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon); // РљРѕРјСѓ РѕС‚РїСЂР°РІР»СЏРµРј
 	}
 		break;
 	case WM_COMMAND:
@@ -28,14 +28,14 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			CONST INT SIZE = 256;
 			CHAR sz_buffer[SIZE] = {};
 			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN); 
-			//Функция GetDlgItem() позволяет получить HWND элемент окна 'hwnd', по RESOURCE_ID нужного элемента.
-			//RESOURCE_ID - это самое обычное значение элемента типа 'INT'
+			//Р¤СѓРЅРєС†РёСЏ GetDlgItem() РїРѕР·РІРѕР»СЏРµС‚ РїРѕР»СѓС‡РёС‚СЊ HWND СЌР»РµРјРµРЅС‚ РѕРєРЅР° 'hwnd', РїРѕ RESOURCE_ID РЅСѓР¶РЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°.
+			//RESOURCE_ID - СЌС‚Рѕ СЃР°РјРѕРµ РѕР±С‹С‡РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ СЌР»РµРјРµРЅС‚Р° С‚РёРїР° 'INT'
 			HWND hEditPassword = GetDlgItem(hwnd, IDC_EDIT_PASSWORD);
 			SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 			SendMessage(hEditPassword, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 		break;
-		case IDOK: MessageBox(hwnd, "Была нажата кнопка ОК", "Info", MB_OK | MB_ICONINFORMATION); break;
+		case IDOK: MessageBox(hwnd, "Р‘С‹Р»Р° РЅР°Р¶Р°С‚Р° РєРЅРѕРїРєР° РћРљ", "Info", MB_OK | MB_ICONINFORMATION); break;
 		case IDCANCEL: EndDialog(hwnd, 0); break;
 		}
 		break;
