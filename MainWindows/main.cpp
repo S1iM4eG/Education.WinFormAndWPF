@@ -42,7 +42,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		CW_USEDEFAULT, CW_USEDEFAULT,					//Размер окна
 		NULL,											//Parent Window
 		NULL,											//hMenu. Для главного окна этот параметр определяет главное меню. Для дочернего окна (Control) этот параметр содержит ResourceID
-		//Благодаря hMenu, дочернее окно всегда можно найти при помощи функции GetDlgItem()
+														//Благодаря hMenu, дочернее окно всегда можно найти при помощи функции GetDlgItem()
 		hInstance,
 		NULL
 	);
