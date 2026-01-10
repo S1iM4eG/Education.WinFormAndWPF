@@ -7,6 +7,7 @@ CHAR g_AddText[64] = {};
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProc1(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DlgProcEdit(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -34,28 +35,33 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_COMMAND:
-		if (LOWORD(wParam) == IDC_LIST && HIWORD(wParam) == LBN_DBLCLK)					//Двойное нажатие по элементу
-			{
-				HWND hList = GetDlgItem(hwnd, IDC_LIST);
-				INT index = SendMessage(hList, LB_GETCURSEL, 0, 0);
-
-				if (index != LB_ERR)
-				{
-					SendMessage(hList, LB_GETTEXT, index, (LPARAM)g_AddText);
-					DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc1, 0); //Вызов окна для редактирования элемента
-
-					if (g_AddText[0] != '\0')
-					{
-						SendMessage(hList, LB_DELETESTRING, index, 0);					//Удаляем старую строку
-						SendMessage(hList, LB_INSERTSTRING, index, (LPARAM)g_AddText);  //Вставляем новую строку на место старой
-					}
-				}
-				return TRUE;
-			}
 		
 		switch (LOWORD(wParam))
 		{
-			
+		//case IDC_LIST:
+		//	if (LOWORD(wParam) == IDC_LIST && HIWORD(wParam) == LBN_DBLCLK)					//Двойное нажатие по элементу
+		//	{
+		//		HWND hList = GetDlgItem(hwnd, IDC_LIST);
+		//		INT index = SendMessage(hList, LB_GETCURSEL, 0, 0);
+
+		//		if (index != LB_ERR)
+		//		{
+		//			SendMessage(hList, LB_GETTEXT, index, (LPARAM)g_AddText);
+		//			DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc1, 0); //Вызов окна для редактирования элемента
+
+		//			if (g_AddText[0] != '\0')
+		//			{
+		//				SendMessage(hList, LB_DELETESTRING, index, 0);					//Удаляем старую строку
+		//				SendMessage(hList, LB_INSERTSTRING, index, (LPARAM)g_AddText);  //Вставляем новую строку на место старой
+		//			}
+		//		}
+		//		return TRUE;
+		//	}
+		//	break;
+		case IDC_LIST:
+			if (HIWORD(wParam) == LBN_DBLCLK)
+				DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc1, 0);
+				break;
 		case IDOK:
 		{
 			HWND hList = GetDlgItem(hwnd, IDC_LIST);
@@ -77,7 +83,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 		case IDC_ADD:																	//Добавление нового элемента
 		{
-			ZeroMemory(g_AddText, sizeof(g_AddText));									
+			ZeroMemory(g_AddText, sizeof(g_AddText));
 
 			DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG1), hwnd, DlgProc1, 0); //Вызов окна для ввода нового элемента
 
@@ -125,7 +131,7 @@ BOOL CALLBACK DlgProc1(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
-	
+
 	case WM_INITDIALOG:
 	{
 		HICON hIсon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON2));
@@ -149,9 +155,38 @@ BOOL CALLBACK DlgProc1(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case IDCANCEL:
 			EndDialog(hwnd, IDCANCEL);
-		return TRUE;
+			return TRUE;
 		}
 		break;
+	}
+	return FALSE;
+}
+BOOL CALLBACK DlgProcEdit(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		SetFocus(GetDlgItem(hwnd, IDC_EDIT_ADD));
+		HWND hParent = GetParent(hwnd);
+		HWND hList = GetDlgItem(hParent, IDC_LIST);
+		HWND hEDit = GetDlgItem(hwnd, IDC_EDIT_ADD);
+		INT i = SendMessage(hList, LB_GETCURSEL, 0, 0);
+		CHAR sz_buffer[MAX_PATH] = {};
+		SendMessage(hwnd, LB_GETTEXT, i, (LPARAM)sz_buffer);
+		SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+	}
+		break;
+	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDCANCEL:EndDialog(hwnd, 0);
+		}
+	}
+	break;
+	case WM_CLOSE:
+		EndDialog(hwnd, 0);
 	}
 	return FALSE;
 }
