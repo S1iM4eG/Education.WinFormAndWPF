@@ -12,6 +12,9 @@
 #define g_i_BUTTON_START_X			g_i_START_X
 #define g_i_BUTTON_START_Y			g_i_START_Y + g_i_DISPLAY_HEIGHT + g_i_INTERVAL
 
+#define g_i_WINDOW_WIDTH			g_i_DISPLAY_WIDTH + g_i_START_X*2 + 16
+#define g_i_WINDOW_HEIGTH			g_i_DISPLAY_HEIGHT + g_i_START_Y*2 + (g_i_BUTTON_SIZE+g_i_INTERVAL)*4 + 38	//38 - высота строки заголовка (TitleBar)
+
 #define BUTTON_X_POSITION(SHIFT)	g_i_BUTTON_START_X + (g_i_BUTTON_SIZE + g_i_INTERVAL)*(SHIFT)
 #define BUTTON_Y_POSITION(SHIFT)	g_i_BUTTON_START_Y + (g_i_BUTTON_SIZE + g_i_INTERVAL)*(SHIFT)
 
@@ -50,14 +53,14 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	//2) Создание окна:
 	HWND hwnd = CreateWindowEx
 	(
-		NULL,							//ExStyle
-		g_sz_WINDOW_CLASS,				//Window class
-		g_sz_WINDOW_CLASS,				//Window title
-		WS_OVERLAPPEDWINDOW,			//Windows style
-		CW_USEDEFAULT, CW_USEDEFAULT,	//Position
-		CW_USEDEFAULT, CW_USEDEFAULT,	//Size
-		NULL,							//Parent Window
-		NULL,							//hMenu
+		NULL,								//ExStyle
+		g_sz_WINDOW_CLASS,					//Window class
+		g_sz_WINDOW_CLASS,					//Window title
+		WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX,//Windows style
+		CW_USEDEFAULT, CW_USEDEFAULT,		//Position
+		g_i_WINDOW_WIDTH, g_i_WINDOW_HEIGTH,//Size
+		NULL,								//Parent Window
+		NULL,								//hMenu
 		hInstance,
 		NULL
 	);
