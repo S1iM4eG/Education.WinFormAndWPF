@@ -5,6 +5,8 @@
 #include<iostream>
 #include"resource.h"
 
+//#define DEBUG
+
 #define g_i_BUTTON_SIZE				50
 #define g_i_INTERVAL				 1
 #define g_i_DOUBLE_BUTTON_SIZE		g_i_BUTTON_SIZE*2 + g_i_INTERVAL
@@ -87,7 +89,10 @@ LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
+#ifdef DEBUG
 		AllocConsole();
+#endif // DEBUG
+
 		freopen("CONOUT$", "w", stdout);
 
 		HWND hEdit = CreateWindowEx
@@ -123,18 +128,26 @@ LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		CreateWindowEx
+		HWND hButton0 = CreateWindowEx
 		(
 			NULL, "Button", "0",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			BUTTON_X_POSITION(0), BUTTON_Y_POSITION(3),
 			g_i_DOUBLE_BUTTON_SIZE, g_i_BUTTON_SIZE,
 			hwnd,
 			HMENU(IDC_BUTTON_0),
 			GetModuleHandle(NULL),
 			NULL
-			);
-
+		);
+		HBITMAP bmpButton0 = (HBITMAP)LoadImage
+		(
+			GetModuleHandle(NULL),
+			"button_0.bmp",
+			IMAGE_BITMAP,
+			g_i_DOUBLE_BUTTON_SIZE, g_i_BUTTON_SIZE,
+			LR_LOADFROMFILE		
+		);
+		SendMessage(hButton0, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmpButton0);
 		CreateWindowEx
 		(
 			NULL, "Button", ".",
@@ -246,10 +259,21 @@ LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			operation = 0;
 			input = FALSE;
 			input_operation = FALSE;
+			executed = FALSE;
 			SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)"0");
 		}
 		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH)
 		{
+#ifdef DEBUG
+			std::cout << "OPERATIONAL BUTTONS:\n";
+			std::cout << "a = " << a << "\tb = " << b << std::endl;
+			std::cout << "Input\t\t" << input << std::endl;
+			std::cout << "InputOperation:\t" << input_operation << std::endl;
+			std::cout << "Executed:\t" << executed << std::endl;
+			std::cout << "\n-------------------------------\n" << executed << std::endl;
+#endif // DEBUG
+
+				
 			if (input)
 			{
 				(a == DBL_MIN ? a : b) = atof(sz_display);
@@ -261,22 +285,38 @@ LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
 		{
-			(a == DBL_MIN ? a : b) = atof(sz_display);
-			input = FALSE;
+#ifdef DEBUG
+			std::cout << "EQUAL BUTTONS:\n";
+			std::cout << "a = " << a << "\tb = " << b << std::endl;
+			std::cout << "Input\t\t" << input << std::endl;
+			std::cout << "InputOperation:\t" << input_operation << std::endl;
+			std::cout << "Executed:\t" << executed << std::endl;
+			std::cout << "\n-------------------------------\n" << executed << std::endl;
+#endif // DEBUG
 
-			switch (operation)
+			if (input)
 			{
-			case IDC_BUTTON_PLUS:  a += b;	break;
-			case IDC_BUTTON_MINUS: a -= b;	break;
-			case IDC_BUTTON_ASTER: a *= b;	break;
-			case IDC_BUTTON_SLASH: a /= b;	break;
+				(a == DBL_MIN ? a : b) = atof(sz_display);
+				input = FALSE;
 			}
-			input_operation = FALSE;
-			executed = TRUE;
-			if (a != DBL_MIN)
+			else if (b == DBL_MIN) b = a;
+			if (operation && a == DBL_MIN)a = atof(sz_display);
+			if (a != DBL_MIN && b != DBL_MIN && operation != 0);
 			{
-				sprintf(sz_display, "%g", a);
-				SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)sz_display);
+				switch (operation)
+				{
+				case IDC_BUTTON_PLUS:  a += b;	break;
+				case IDC_BUTTON_MINUS: a -= b;	break;
+				case IDC_BUTTON_ASTER: a *= b;	break;
+				case IDC_BUTTON_SLASH: a /= b;	break;
+				}
+				input_operation = FALSE;
+				executed = TRUE;
+				if (a != DBL_MIN)
+				{
+					sprintf(sz_display, "%g", a);
+					SendMessage(hEditDisplay, WM_SETTEXT, 0, (LPARAM)sz_display);
+				}
 			}
 		}
 
@@ -355,36 +395,38 @@ LRESULT WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SendMessage(GetDlgItem(hwnd, wParam - VK_NUMPAD0 + IDC_BUTTON_0), BM_SETSTATE, FALSE, NULL);
 			SendMessage(hwnd, WM_COMMAND, LOWORD(wParam - VK_NUMPAD0 + IDC_BUTTON_0), 0);
 		}
-		switch (wParam)
+		else
 		{
-		//case VK_OEM_PLUS:
-		case VK_ADD:       
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_PLUS), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_PLUS),  BM_SETSTATE, FALSE, 0); break;
-		case VK_OEM_MINUS:
-		case VK_SUBTRACT:  
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MINUS), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_MINUS), BM_SETSTATE, FALSE, 0); break;
-		case VK_MULTIPLY:  
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_ASTER), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_ASTER), BM_SETSTATE, FALSE, 0); break;
-		case VK_OEM_2:
-		case VK_DIVIDE:    
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_SLASH), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_SLASH), BM_SETSTATE, FALSE, 0); break;
-		case VK_OEM_PERIOD:
-		case VK_DECIMAL:   
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_POINT), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETSTATE, FALSE, 0); break;
-		case VK_BACK:	   
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_BSP),   BM_SETSTATE, FALSE, 0); break;
-		case VK_ESCAPE:	   
-			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_CLR), 0);
-			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_CLR),   BM_SETSTATE, FALSE, 0); break;
-		//case VK_RETURN:	   SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EQUAL), BM_SETSTATE, FALSE, 0); break;
+			switch (wParam)
+			{
+				//case VK_OEM_PLUS:
+			case VK_ADD:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_PLUS), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_PLUS), BM_SETSTATE, FALSE, 0); break;
+			case VK_OEM_MINUS:
+			case VK_SUBTRACT:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MINUS), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_MINUS), BM_SETSTATE, FALSE, 0); break;
+			case VK_MULTIPLY:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_ASTER), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_ASTER), BM_SETSTATE, FALSE, 0); break;
+			case VK_OEM_2:
+			case VK_DIVIDE:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_SLASH), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_SLASH), BM_SETSTATE, FALSE, 0); break;
+			case VK_OEM_PERIOD:
+			case VK_DECIMAL:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_POINT), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETSTATE, FALSE, 0); break;
+			case VK_BACK:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_BSP), BM_SETSTATE, FALSE, 0); break;
+			case VK_ESCAPE:
+				SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_CLR), 0);
+				SendMessage(GetDlgItem(hwnd, IDC_BUTTON_CLR), BM_SETSTATE, FALSE, 0); break;
+				//case VK_RETURN:	   SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EQUAL), BM_SETSTATE, FALSE, 0); break;
+			}
 		}
-
 
 	}
 		break;
